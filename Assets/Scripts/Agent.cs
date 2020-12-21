@@ -6,5 +6,14 @@ public class Agent : MonoBehaviour
 {
     public int row;
     public int col;
-    private Transform target; // currently not in use
+    public int cRow; // current row
+    public bool isSeated;
+    public Transform target;
+
+    void Start()
+    {
+        cRow = 0;
+        target = new GameObject().transform;
+    }
 }
+
