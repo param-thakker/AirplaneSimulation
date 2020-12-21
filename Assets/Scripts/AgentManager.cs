@@ -15,14 +15,15 @@ public class AgentManager : MonoBehaviour
 
     void Start()
     {
-        // collects all agents into List
-        agents.AddRange(GameObject.FindGameObjectsWithTag("Agent"));
-
-        // sorts agent List by row, to be used - potentially
-        // agents = agents.OrderBy(t => t.GetComponent<Agent>().row).ToList();
+        // sorts agent List by alternating rows and alternating columns from window to aisle
+        EfficientQueue();
 
         // sorts agent List randomly - our control group
-        agents = Randomize(agents);
+        // RandomizeQueue();
+
+        // sorts agent List by boarding groups (every 2 rows) from back to front
+        // also randomizes each boarding group
+        // BoardingGroupQueue(); - incomplete
     }
 
     void Update()
@@ -85,7 +86,6 @@ public class AgentManager : MonoBehaviour
                 script.isSeated = true; // to prevent repeated StowAndSit calls
             }
         }
-        
         UpdateDestination();
     }
 
@@ -130,18 +130,67 @@ public class AgentManager : MonoBehaviour
         return false;
     }
 
-    private List<GameObject> Randomize(List<GameObject> list) // randomizes a given List
+    private void RandomizeQueue() // randomizes a given List
     {
+        agents.AddRange(GameObject.FindGameObjectsWithTag("Agent"));
+
         System.Random rand = new System.Random();
-        int i = list.Count;
+        int i = agents.Count;
+
         while (i > 1) 
         {
             i--;
             int r = rand.Next(i + 1);
-            GameObject temp = list[r];
-            list[r] = list[i];
-            list[i] = temp;
+            GameObject temp = agents[r];
+            agents[r] = agents[i];
+            agents[i] = temp;
         }
-        return list;
+    }
+
+    // assumes every row is fully filled
+    private void BoardingGroupQueue()
+    {
+        // collects all agents into List
+        agents.AddRange(GameObject.FindGameObjectsWithTag("Agent"));
+        // sorts agent List by row
+        agents = agents.OrderByDescending(t => t.GetComponent<Agent>().row).ToList();
+
+        int numRows = agents.Count / 6;
+
+        for (int j = numRows; j > 0; j -= 2)
+        {
+            System.Random rand = new System.Random();
+
+            int i = 0;
+            if (j == 1) i = 6;
+            else i = 12;
+
+            while (i > 1) 
+            {
+                i--;
+                int r = rand.Next(i + 1);
+                GameObject temp = agents[r];
+                agents[r] = agents[i];
+                agents[i] = temp;
+            }
+        }
+    }
+
+    // assumes every row is fully filled
+    private void EfficientQueue()
+    {
+        int n = GameObject.FindGameObjectsWithTag("Agent").Length;
+        int row = n / 6;
+        int[] col = new int[] {1, 6, 1, 6, 2, 5, 2, 5, 3, 4, 3, 4};
+
+        for (int i = 0; i < 12; i++) 
+        {
+            row = (n / 6) - ((i % 4) / 2);
+            for (int j = row; j > 0; j -= 2)
+            {
+                Debug.Log("Agent (" + j + ", " + col[i] + ")");
+                agents.Add(GameObject.Find("Agent (" + j + ", " + col[i] + ")"));
+            }
+        }
     }
 }
