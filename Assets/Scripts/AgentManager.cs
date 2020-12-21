@@ -76,6 +76,7 @@ public class AgentManager : MonoBehaviour
                 isRowOccupied[currentRow] = true;
 
                 script.cRow = currentRow;
+                Debug.Log(agents[i].name + ": " + script.target.position);
                 nav.SetDestination(script.target.position);
             }
             

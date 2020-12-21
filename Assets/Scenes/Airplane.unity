@@ -130,7 +130,7 @@ GameObject:
   m_Component:
   - component: {fileID: 12319481}
   m_Layer: 0
-  m_Name: Row 6
+  m_Name: R6
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -166,7 +166,7 @@ GameObject:
   m_Component:
   - component: {fileID: 12937128}
   m_Layer: 0
-  m_Name: Row 1
+  m_Name: R1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -308,7 +308,7 @@ GameObject:
   m_Component:
   - component: {fileID: 46438129}
   m_Layer: 0
-  m_Name: Row 3
+  m_Name: R3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -636,6 +636,11 @@ PrefabInstance:
       propertyPath: row
       value: 3
       objectReference: {fileID: 0}
+    - target: {fileID: 3869028836724899430, guid: 99dd8edeab263448dbf640b17a916489,
+        type: 3}
+      propertyPath: target
+      value: 
+      objectReference: {fileID: 1346917918}
     - target: {fileID: 3869028836724899431, guid: 99dd8edeab263448dbf640b17a916489,
         type: 3}
       propertyPath: m_StoppingDistance
@@ -2018,7 +2023,7 @@ GameObject:
   m_Component:
   - component: {fileID: 462577093}
   m_Layer: 0
-  m_Name: Row 4
+  m_Name: R4
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3124,7 +3129,7 @@ GameObject:
   m_Component:
   - component: {fileID: 701920139}
   m_Layer: 0
-  m_Name: Row 7
+  m_Name: R7
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5395,7 +5400,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1195388999}
   m_Layer: 0
-  m_Name: Row 2
+  m_Name: R2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5431,7 +5436,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1216178778}
   m_Layer: 0
-  m_Name: Row 5
+  m_Name: R5
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
