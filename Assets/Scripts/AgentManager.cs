@@ -1,12 +1,14 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using System.Linq;
 
 public class AgentManager : MonoBehaviour
 {
     private List<GameObject> agents = new List<GameObject>();
     private int index = 0; // index of the agent at the front of the queue, separates agents inside/outside of the airplane
+    private int selection = -1; //determines whether or not a type of boarding has been selected
     private int interactions = 0; //counter for interactions
     private bool[] isRowOccupied = new bool[8];
     private Vector3 ahead = Vector3.forward * 1.5f;
@@ -14,6 +16,9 @@ public class AgentManager : MonoBehaviour
     public Transform entrance;
     public Material matGreen;
     public Material matRed;
+    public Button random;
+    public Button boarding;
+    public Button efficient;
 
     void Start()
     {
@@ -21,75 +26,84 @@ public class AgentManager : MonoBehaviour
         //EfficientQueue();
 
         // sorts agent List randomly - our control group
-         RandomizeQueue();
+        // RandomizeQueue();
 
         // sorts agent List by boarding groups (every 2 rows) from back to front
         // also randomizes each boarding group
         // BoardingGroupQueue(); - incomplete
+
+        random.onClick.AddListener(RandoSelection);
+        boarding.onClick.AddListener(BoardingSelection);
+        efficient.onClick.AddListener(EfficientSelection);
     }
 
     void Update()
     {
         // sets the targets of the agents that are still in the queue (outside of the plane)
         // first agent goes to "entrance", subsequent agents follow the agent in front of them
-        Transform tempTarget = entrance;
-        for (int i = index; i < agents.Count; i++) 
+        if (selection != -1)
         {
-            agents[i].GetComponent<Agent>().target = tempTarget;
-            tempTarget = agents[i].transform;
-        }
-        
-        UpdateDestination();
-
-        GameObject front = null; // agent at the front of the queue
-        if (index < agents.Count) front = agents[index]; // IndexOutOfBounds check
-
-        if (pathComplete(front) && isRowOccupied[0] == false) index++;
-
-        // sets the targets of the agents that waiting to stow and sit down (inside of the plane)
-        for (int i = 0; i < index; i++) 
-        {
-            UnityEngine.AI.NavMeshAgent nav = agents[i].GetComponent<UnityEngine.AI.NavMeshAgent>();
-            Agent script = agents[i].GetComponent<Agent>();
-
-            if (script.isSeated || !pathComplete(agents[i])) continue;
-
-            int currentRow = script.cRow;
-            int previousRow = currentRow;
-
-            // agent is in line to get to respective row
-            if (currentRow < script.row)
+            Transform tempTarget = entrance;
+            for (int i = index; i < agents.Count; i++)
             {
-                // determines the furthest unblocked/unoccupied row 
-                for (int j = currentRow + 1; j <= script.row; j++)
+                agents[i].GetComponent<Agent>().target = tempTarget;
+                tempTarget = agents[i].transform;
+            }
+
+            UpdateDestination();
+
+            GameObject front = null; // agent at the front of the queue
+            if (index < agents.Count) front = agents[index]; // IndexOutOfBounds check
+
+            if (pathComplete(front) && isRowOccupied[0] == false) index++;
+
+            // sets the targets of the agents that waiting to stow and sit down (inside of the plane)
+            for (int i = 0; i < index; i++)
+            {
+                UnityEngine.AI.NavMeshAgent nav = agents[i].GetComponent<UnityEngine.AI.NavMeshAgent>();
+                Agent script = agents[i].GetComponent<Agent>();
+
+                if (script.isSeated || !pathComplete(agents[i])) continue;
+
+                int currentRow = script.cRow;
+                int previousRow = currentRow;
+
+                // agent is in line to get to respective row
+                if (currentRow < script.row)
                 {
-                    if (isRowOccupied[j] == true) 
+                    script.status = agents[i].name + " is heading to row " + script.row;
+                    // determines the furthest unblocked/unoccupied row 
+                    for (int j = currentRow + 1; j <= script.row; j++)
                     {
-                        currentRow = j - 1;
-                        break;
+                        if (isRowOccupied[j] == true)
+                        {
+                            currentRow = j - 1;
+                            break;
+                        }
+                        else currentRow = j;
                     }
-                    else currentRow = j;
+
+                    GameObject row = GameObject.Find("Row " + currentRow);
+                    script.target = row.transform;
+
+                    isRowOccupied[previousRow] = false;
+                    isRowOccupied[currentRow] = true;
+
+                    script.cRow = currentRow;
+                    Debug.Log(agents[i].name + ": " + script.target.position);
+                    nav.SetDestination(script.target.position);
                 }
-                
-                GameObject row = GameObject.Find("Row " + currentRow);
-                script.target = row.transform;
 
-                isRowOccupied[previousRow] = false;
-                isRowOccupied[currentRow] = true;
-
-                script.cRow = currentRow;
-               // Debug.Log(agents[i].name + ": " + script.target.position);
-                nav.SetDestination(script.target.position);
+                // agent has arrived at respective row
+                if (currentRow == script.row && pathComplete(agents[i]) && !script.isSeated)
+                {
+                    script.status = agents[i].name + " is stowing their luggage";
+                    StartCoroutine(StowAndSit(agents[i], script, currentRow));
+                    script.isSeated = true; // to prevent repeated StowAndSit calls
+                }
             }
-            
-            // agent has arrived at respective row
-            if (currentRow == script.row && pathComplete(agents[i]) && !script.isSeated) 
-            {
-                StartCoroutine(StowAndSit(agents[i], script, currentRow));
-                script.isSeated = true; // to prevent repeated StowAndSit calls
-            }
+            UpdateDestination();
         }
-        UpdateDestination();
     }
 
     private IEnumerator StowAndSit(GameObject a, Agent script, int currentRow)
@@ -116,6 +130,8 @@ public class AgentManager : MonoBehaviour
             }
         }
 
+        script.status = a.name + " is preparing to sit";
+
         if (otherAgents.Count != 0) //when there are other agents in this agent's way
         {
             GameObject tempPosition = new GameObject("Temp Position of " + a.name);
@@ -126,7 +142,7 @@ public class AgentManager : MonoBehaviour
                 GameObject row = GameObject.Find("Row " + script.row);
                 ag.GetComponent<Agent>().target = row.transform;
             }
-
+            script.status = a.name + " is waiting for other passengers, so " + a.name + " can get to their seat";
             yield return new WaitForSeconds(2f); // Allow seated passengers to move out of the way
             script.target = seat.transform;
             Destroy(tempPosition);
@@ -144,7 +160,37 @@ public class AgentManager : MonoBehaviour
             script.target = seat.transform;
         }
 
+        script.status = a.name + " is seated";
+
         
+    }
+
+    private void Disabler()
+    {
+        random.gameObject.SetActive(false);
+        boarding.gameObject.SetActive(false);
+        efficient.gameObject.SetActive(false);
+    }
+
+    private void RandoSelection()
+    {
+        selection = 0;
+        RandomizeQueue();
+        Disabler();
+    }
+
+    private void BoardingSelection()
+    {
+        selection = 1;
+        BoardingGroupQueue();
+        Disabler();
+    }
+
+    private void EfficientSelection()
+    {
+        selection = 2;
+        EfficientQueue();
+        Disabler();
     }
 
     private void UpdateDestination() // sets the destination for all agents at once

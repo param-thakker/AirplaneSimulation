@@ -133,3 +133,8 @@ MonoBehaviour:
   cRow: 0
   isSeated: 0
   target: {fileID: 0}
+  status: 
+  matOrange: {fileID: 2100000, guid: 8ba03c3d980d33b44afeeb49d7b27fe7, type: 2}
+  whiteSeat: {fileID: 2100000, guid: 160829d593d628444827c3d4304cb252, type: 2}
+  statusUpdater: {fileID: 3200773320862306672, guid: 02b70f74cd233004cad62f9ed4b5c678,
+    type: 3}
