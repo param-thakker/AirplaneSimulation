@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using System;
 
 public class Agent : MonoBehaviour
 {
@@ -14,6 +15,7 @@ public class Agent : MonoBehaviour
     public Material matOrange;
     public Material whiteSeat;
     public Text statusUpdater;
+    public Text interactionCount;
 
 
     void Start()
@@ -33,5 +35,18 @@ public class Agent : MonoBehaviour
     {
         GameObject.Find("Seat " + "(" + row + ", " + col + ")").GetComponent<Renderer>().material = whiteSeat;
     }
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.gameObject.tag=="Agent"){
+            SetText();
+        }
+    }
+    void SetText()
+    {
+        int newScore = Convert.ToInt32(interactionCount.text) + 1;
+        interactionCount.text =  newScore.ToString();
+    } 
+
+
 }
 
