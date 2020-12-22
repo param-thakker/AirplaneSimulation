@@ -22,16 +22,6 @@ public class AgentManager : MonoBehaviour
 
     void Start()
     {
-        // sorts agent List by alternating rows and alternating columns from window to aisle
-        //EfficientQueue();
-
-        // sorts agent List randomly - our control group
-        // RandomizeQueue();
-
-        // sorts agent List by boarding groups (every 2 rows) from back to front
-        // also randomizes each boarding group
-        // BoardingGroupQueue(); - incomplete
-
         random.onClick.AddListener(RandoSelection);
         boarding.onClick.AddListener(BoardingSelection);
         efficient.onClick.AddListener(EfficientSelection);
@@ -55,7 +45,11 @@ public class AgentManager : MonoBehaviour
             GameObject front = null; // agent at the front of the queue
             if (index < agents.Count) front = agents[index]; // IndexOutOfBounds check
 
-            if (pathComplete(front) && isRowOccupied[0] == false) index++;
+            if (pathComplete(front) && isRowOccupied[0] == false) 
+            {
+                front.GetComponent<UnityEngine.AI.NavMeshAgent>().stoppingDistance = 1;
+                index++;
+            }
 
             // sets the targets of the agents that waiting to stow and sit down (inside of the plane)
             for (int i = 0; i < index; i++)
@@ -84,7 +78,6 @@ public class AgentManager : MonoBehaviour
                     }
 
                     GameObject row = GameObject.Find("Row " + currentRow);
-                    Debug.Log("Row " + currentRow);
                     script.target = row.transform;
 
                     isRowOccupied[previousRow] = false;
@@ -177,6 +170,8 @@ public class AgentManager : MonoBehaviour
     {
         selection = 0;
         RandomizeQueue();
+        SetRandomStoppingDistance(); 
+        StartingPositions();
         Disabler();
     }
 
@@ -184,6 +179,8 @@ public class AgentManager : MonoBehaviour
     {
         selection = 1;
         BoardingGroupQueue();
+        SetRandomStoppingDistance(); 
+        StartingPositions();
         Disabler();
     }
 
@@ -191,6 +188,8 @@ public class AgentManager : MonoBehaviour
     {
         selection = 2;
         EfficientQueue();
+        SetRandomStoppingDistance(); 
+        StartingPositions();
         Disabler();
     }
 
@@ -220,6 +219,47 @@ public class AgentManager : MonoBehaviour
             }
         }
         return false;
+    }
+
+    private void SetRandomStoppingDistance() 
+    {
+        System.Random rand = new System.Random();
+        foreach (var agent in agents)
+        {
+            UnityEngine.AI.NavMeshAgent nav = agent.GetComponent<UnityEngine.AI.NavMeshAgent>();
+
+            // (1, x) CHANGE x to adjust stopping distance randomization
+            nav.stoppingDistance = rand.Next(1, 5); // distance [1, x)
+        }
+    }
+
+    private void StartingPositions() // sets the starting positions for the agents based on queue
+    {
+        int a = 0;
+        int x = 0;
+        int z = 0;
+        for (int i = 0; i < 6; i++) // rows
+        {
+            z = i * 4;
+            if (i % 2 == 0) // alternating columns
+            {
+                for (int j = 0; j < 10; j++) // right to left columns
+                {
+                    x = j * 3;
+                    agents[a].transform.position = new Vector3(x, 1.25f, z);
+                    a++;
+                }
+            }
+            else
+            {
+                for (int j = 9; j >= 0; j--) // left to right columns
+                {
+                    x = j * 3;
+                    agents[a].transform.position = new Vector3(x, 1.25f, z);
+                    a++;
+                }
+            }
+        }
     }
 
     private void RandomizeQueue() // randomizes a given List
