@@ -90,7 +90,7 @@ public class AgentManager : MonoBehaviour
                     isRowOccupied[currentRow] = true;
 
                     script.cRow = currentRow;
-                    Debug.Log(agents[i].name + ": " + script.target.position);
+                    // Debug.Log(agents[i].name + ": " + script.target.position);
                     nav.SetDestination(script.target.position);
                 }
 
@@ -255,14 +255,14 @@ public class AgentManager : MonoBehaviour
             int i = 0;
             if (j == 1) i = 6;
             else i = 12;
-
+            int lowerBound = (j * 6) - i;
             while (i > 1) 
             {
                 i--;
-                int r = rand.Next(i + 1);
+                int r = rand.Next(lowerBound, lowerBound + i);
                 GameObject temp = agents[r];
-                agents[r] = agents[i];
-                agents[i] = temp;
+                agents[r] = agents[lowerBound + i];
+                agents[lowerBound + i] = temp;
             }
         }
     }
@@ -279,7 +279,7 @@ public class AgentManager : MonoBehaviour
             row = (n / 6) - ((i % 4) / 2);
             for (int j = row; j > 0; j -= 2)
             {
-                Debug.Log("Agent (" + j + ", " + col[i] + ")");
+                // Debug.Log("Agent (" + j + ", " + col[i] + ")");
                 agents.Add(GameObject.Find("Agent (" + j + ", " + col[i] + ")"));
             }
         }
