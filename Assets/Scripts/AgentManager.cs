@@ -10,7 +10,7 @@ public class AgentManager : MonoBehaviour
     private int index = 0; // index of the agent at the front of the queue, separates agents inside/outside of the airplane
     private int selection = -1; //determines whether or not a type of boarding has been selected
     private int interactions = 0; //counter for interactions
-    private bool[] isRowOccupied = new bool[8];
+    private bool[] isRowOccupied = new bool[11];
     private Vector3 ahead = Vector3.forward * 1.5f;
 
     public Transform entrance;
@@ -84,6 +84,7 @@ public class AgentManager : MonoBehaviour
                     }
 
                     GameObject row = GameObject.Find("Row " + currentRow);
+                    Debug.Log("Row " + currentRow);
                     script.target = row.transform;
 
                     isRowOccupied[previousRow] = false;

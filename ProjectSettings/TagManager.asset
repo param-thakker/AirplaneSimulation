@@ -5,6 +5,8 @@ TagManager:
   serializedVersion: 2
   tags:
   - Agent
+  - Agent Alt
+  - Agent Cross
   layers:
   - Default
   - TransparentFX
