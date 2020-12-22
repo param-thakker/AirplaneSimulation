@@ -130,6 +130,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   row: 2
   col: 6
-  currentRow: 0
+  cRow: 0
   isSeated: 0
   target: {fileID: 0}

@@ -7,7 +7,9 @@ public class AgentManager : MonoBehaviour
 {
     private List<GameObject> agents = new List<GameObject>();
     private int index = 0; // index of the agent at the front of the queue, separates agents inside/outside of the airplane
+    private int interactions = 0; //counter for interactions
     private bool[] isRowOccupied = new bool[8];
+    private Vector3 ahead = Vector3.forward * 1.5f;
 
     public Transform entrance;
     public Material matGreen;
@@ -16,10 +18,10 @@ public class AgentManager : MonoBehaviour
     void Start()
     {
         // sorts agent List by alternating rows and alternating columns from window to aisle
-        EfficientQueue();
+        //EfficientQueue();
 
         // sorts agent List randomly - our control group
-        // RandomizeQueue();
+         RandomizeQueue();
 
         // sorts agent List by boarding groups (every 2 rows) from back to front
         // also randomizes each boarding group
@@ -76,7 +78,7 @@ public class AgentManager : MonoBehaviour
                 isRowOccupied[currentRow] = true;
 
                 script.cRow = currentRow;
-                Debug.Log(agents[i].name + ": " + script.target.position);
+               // Debug.Log(agents[i].name + ": " + script.target.position);
                 nav.SetDestination(script.target.position);
             }
             
@@ -96,11 +98,53 @@ public class AgentManager : MonoBehaviour
 
         yield return new WaitForSeconds(3f); // stowing duration of 3 seconds
         
-        isRowOccupied[currentRow] = false;
         a.GetComponent<Renderer>().material = matGreen;
 
         GameObject seat = GameObject.Find("Seat " + "(" + script.row + ", " + script.col + ")"); // move agent to seat
-        script.target = seat.transform;
+        Vector3 ray = seat.transform.position - a.transform.position;
+        ray.y = 0;
+        float distance = ray.magnitude;
+        RaycastHit[] hits = Physics.RaycastAll(a.transform.position, ray, distance);
+        List<GameObject> otherAgents = new List<GameObject>();
+        foreach (var hit in hits)
+        {
+            if (hit.collider.gameObject.tag.Equals("Agent"))
+            {
+                otherAgents.Add(hit.collider.gameObject);
+                Debug.Log(a.name + " has found " + hit.collider.gameObject.name + " in their way");
+                Debug.DrawLine(a.transform.position, hit.collider.gameObject.transform.position, Color.red);
+            }
+        }
+
+        if (otherAgents.Count != 0) //when there are other agents in this agent's way
+        {
+            GameObject tempPosition = new GameObject("Temp Position of " + a.name);
+            tempPosition.transform.position = a.transform.position + ahead;
+            script.target = tempPosition.transform;
+            foreach (var ag in otherAgents)
+            {
+                GameObject row = GameObject.Find("Row " + script.row);
+                ag.GetComponent<Agent>().target = row.transform;
+            }
+
+            yield return new WaitForSeconds(2f); // Allow seated passengers to move out of the way
+            script.target = seat.transform;
+            Destroy(tempPosition);
+
+            yield return new WaitForSeconds(1.5f); //Wait for new passenger to get to seat
+            foreach (var ag in otherAgents)
+            {
+                seat = GameObject.Find("Seat " + "(" + ag.GetComponent<Agent>().row + ", " + ag.GetComponent<Agent>().col + ")");
+                ag.GetComponent<Agent>().target = seat.transform;
+            }
+            isRowOccupied[currentRow] = false;
+        } else
+        {
+            isRowOccupied[currentRow] = false;
+            script.target = seat.transform;
+        }
+
+        
     }
 
     private void UpdateDestination() // sets the destination for all agents at once
