@@ -25,9 +25,9 @@ public class AgentManager : MonoBehaviour
 
     void Start()
     {
-        random.onClick.AddListener(FullEnabler);
-        boarding.onClick.AddListener(AltEnabler);
-        efficient.onClick.AddListener(CrossEnabler);
+        random.onClick.AddListener(Selector);
+        boarding.onClick.AddListener(BoardingSelection);
+        efficient.onClick.AddListener(EfficientSelection);
     }
 
     void Update()
@@ -162,17 +162,12 @@ public class AgentManager : MonoBehaviour
         
     }
 
-    private void FullEnabler()
-    {
-        Selector();
-    }
-
     private void AltEnabler()
     {
         full.SetActive(false);
         alternate.SetActive(true);
         cross.SetActive(false);
-        Selector();
+        RandoSelection();
     }
 
     private void CrossEnabler()
@@ -180,7 +175,7 @@ public class AgentManager : MonoBehaviour
         full.SetActive(false);
         alternate.SetActive(false);
         cross.SetActive(true);
-        Selector();
+        RandoSelection();
     }
 
     private void Disabler()
@@ -192,15 +187,15 @@ public class AgentManager : MonoBehaviour
 
     private void Selector()
     {
-        random.onClick.RemoveListener(FullEnabler);
-        boarding.onClick.RemoveListener(AltEnabler);
-        efficient.onClick.RemoveListener(CrossEnabler);
-        random.GetComponentInChildren<Text>().text = "Random";
-        boarding.GetComponentInChildren<Text>().text = "Boarding Groups";
-        efficient.GetComponentInChildren<Text>().text = "Efficient";
+        random.onClick.RemoveListener(Selector);
+        boarding.onClick.RemoveListener(BoardingSelection);
+        efficient.onClick.RemoveListener(EfficientSelection);
+        random.GetComponentInChildren<Text>().text = "Full";
+        boarding.GetComponentInChildren<Text>().text = "Alternative";
+        efficient.GetComponentInChildren<Text>().text = "Cross";
         random.onClick.AddListener(RandoSelection);
-        boarding.onClick.AddListener(BoardingSelection);
-        efficient.onClick.AddListener(EfficientSelection);
+        boarding.onClick.AddListener(AltEnabler);
+        efficient.onClick.AddListener(CrossEnabler);
     }
 
     private void RandoSelection()

@@ -7969,7 +7969,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Cross
+  m_Text: Efficient
 --- !u!222 &624071591
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -13925,7 +13925,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Alternate
+  m_Text: Boarding Groups
 --- !u!222 &1145192511
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -20456,7 +20456,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Full
+  m_Text: Random
 --- !u!222 &1692700312
 CanvasRenderer:
   m_ObjectHideFlags: 0
