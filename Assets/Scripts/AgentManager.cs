@@ -270,7 +270,10 @@ public class AgentManager : MonoBehaviour
         int a = 0;
         int x = 0;
         int z = 0;
-        for (int i = 0; i < 6; i++) // rows
+
+        int r = agents.Count / 10;
+        
+        for (int i = 0; i < r; i++) // rows
         {
             z = i * 4;
             if (i % 2 == 0) // alternating columns
