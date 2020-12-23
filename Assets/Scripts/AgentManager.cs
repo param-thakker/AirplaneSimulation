@@ -19,12 +19,15 @@ public class AgentManager : MonoBehaviour
     public Button random;
     public Button boarding;
     public Button efficient;
+    public GameObject full;
+    public GameObject alternate;
+    public GameObject cross;
 
     void Start()
     {
-        random.onClick.AddListener(RandoSelection);
-        boarding.onClick.AddListener(BoardingSelection);
-        efficient.onClick.AddListener(EfficientSelection);
+        random.onClick.AddListener(FullEnabler);
+        boarding.onClick.AddListener(AltEnabler);
+        efficient.onClick.AddListener(CrossEnabler);
     }
 
     void Update()
@@ -159,6 +162,27 @@ public class AgentManager : MonoBehaviour
         
     }
 
+    private void FullEnabler()
+    {
+        Selector();
+    }
+
+    private void AltEnabler()
+    {
+        full.SetActive(false);
+        alternate.SetActive(true);
+        cross.SetActive(false);
+        Selector();
+    }
+
+    private void CrossEnabler()
+    {
+        full.SetActive(false);
+        alternate.SetActive(false);
+        cross.SetActive(true);
+        Selector();
+    }
+
     private void Disabler()
     {
         random.gameObject.SetActive(false);
@@ -166,31 +190,44 @@ public class AgentManager : MonoBehaviour
         efficient.gameObject.SetActive(false);
     }
 
+    private void Selector()
+    {
+        random.onClick.RemoveListener(FullEnabler);
+        boarding.onClick.RemoveListener(AltEnabler);
+        efficient.onClick.RemoveListener(CrossEnabler);
+        random.GetComponentInChildren<Text>().text = "Random";
+        boarding.GetComponentInChildren<Text>().text = "Boarding Groups";
+        efficient.GetComponentInChildren<Text>().text = "Efficient";
+        random.onClick.AddListener(RandoSelection);
+        boarding.onClick.AddListener(BoardingSelection);
+        efficient.onClick.AddListener(EfficientSelection);
+    }
+
     private void RandoSelection()
     {
         selection = 0;
         RandomizeQueue();
+        Disabler();
         SetRandomStoppingDistance(); 
         StartingPositions();
-        Disabler();
     }
 
     private void BoardingSelection()
     {
         selection = 1;
         BoardingGroupQueue();
-        SetRandomStoppingDistance(); 
-        StartingPositions();
         Disabler();
+        SetRandomStoppingDistance();
+        StartingPositions();
     }
 
     private void EfficientSelection()
     {
         selection = 2;
         EfficientQueue();
+        Disabler();
         SetRandomStoppingDistance(); 
         StartingPositions();
-        Disabler();
     }
 
     private void UpdateDestination() // sets the destination for all agents at once
